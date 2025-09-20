@@ -99,8 +99,8 @@ class Footer extends StatelessWidget {
           ),
           _contactItem(
             Icons.mail,
-            'Santiago_mosch@hotmail.com',
-            'mailto:Santiago_mosch@hotmail.com',
+            'metalwailerscomercial@gmail.com',
+            'mailto:metalwailerscomercial@gmail.com',
             textColor,
           ),
           _contactItem(

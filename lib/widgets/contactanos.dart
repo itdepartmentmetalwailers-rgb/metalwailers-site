@@ -48,7 +48,7 @@ class _ContactanosState extends State<Contactanos> {
       functionUrl,
       headers: headers,
       body: jsonEncode({
-        'to': 'Santiago_mosch@hotmail.com',
+        'to': 'metalwailerscomercial@gmail.com',
         'subject': 'Nueva consulta de $nombre',
         'text':
             'Nombre/Empresa: $nombre\nEmail: $email\nTeléfono: $telefono\nServicio: $servicio\nRubro: $rubro\nComentarios: $comentarios',
@@ -97,9 +97,9 @@ class _ContactanosState extends State<Contactanos> {
       ],
       [
         'Email',
-        'Santiago_mosch@hotmail.com',
+        'metalwailerscomercial@gmail.com',
         FontAwesomeIcons.envelope,
-        'mailto:Santiago_mosch@hotmail.com',
+        'mailto:metalwailerscomercial@gmail.com',
       ],
       [
         'Dirección',

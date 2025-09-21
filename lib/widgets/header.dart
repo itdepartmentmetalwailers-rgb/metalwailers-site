@@ -86,10 +86,9 @@ class _HeaderMetalWailersState extends State<HeaderMetalWailers>
     super.didChangeDependencies();
 
     // Precarga segura
-    precacheImage(
-      const AssetImage('assets/logo/logoweb.png'),
-      context,
-    ).then((_) {
+    precacheImage(const AssetImage('assets/logo/logoweb.png'), context).then((
+      _,
+    ) {
       if (mounted) {
         setState(() => _imagenCargada = true);
         _iniciarAnimacion();
@@ -133,14 +132,15 @@ class _HeaderMetalWailersState extends State<HeaderMetalWailers>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    isWide ?
-                    Image.asset(
-                      'assets/logo/logowebbbbb.png',
-                      height: isWide ? size.width * 0.17 : size.width * 0.26,
-                      frameBuilder: (context, child, frame, _) => child,
-                    )
-                    : SizedBox.shrink(),
-                   SizedBox(width:isWide ?  12 : 0),
+                    isWide
+                        ? Image.asset(
+                          'assets/logo/logowebbbbb.png',
+                          height:
+                              isWide ? size.width * 0.17 : size.width * 0.26,
+                          frameBuilder: (context, child, frame, _) => child,
+                        )
+                        : SizedBox.shrink(),
+                    SizedBox(width: isWide ? 12 : 0),
                     SlideTransition(
                       position: _offsetAnimation,
                       child: AnimatedOpacity(
@@ -162,7 +162,7 @@ class _HeaderMetalWailersState extends State<HeaderMetalWailers>
             ),
           ),
         ),
-         SizedBox(height: isWide ? 100: 50),
+        SizedBox(height: isWide ? 100 : 50),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
@@ -177,7 +177,7 @@ class _HeaderMetalWailersState extends State<HeaderMetalWailers>
                     style: TextStyle(
                       fontSize: isWide ? 32 : size.width * 0.06,
                       color: Colors.black,
-                      fontWeight: FontWeight.w500
+                      fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.start,
                   ),
@@ -193,7 +193,7 @@ class _HeaderMetalWailersState extends State<HeaderMetalWailers>
                     style: TextStyle(
                       fontSize: isWide ? 28 : size.width * 0.06,
                       color: Colors.black,
-                      fontWeight: FontWeight.w500
+                      fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.start,
                   ),

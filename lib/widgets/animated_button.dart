@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 class HoverAnimatedButton extends StatefulWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // ← ahora admite null para deshabilitar
   final String text;
+  final bool loading; // ← spinner + estados
 
   const HoverAnimatedButton({
     super.key,
     required this.onPressed,
     required this.text,
+    this.loading = false,
   });
 
   @override
@@ -19,6 +21,8 @@ class _HoverAnimatedButtonState extends State<HoverAnimatedButton> {
 
   @override
   Widget build(BuildContext context) {
+    final disabled = widget.onPressed == null || widget.loading;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
@@ -32,7 +36,7 @@ class _HoverAnimatedButtonState extends State<HoverAnimatedButton> {
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              width: _isHovering ? 250 : 0,
+              width: _isHovering && !disabled ? 250 : 0,
               height: 50,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 13, 24, 45),
@@ -43,10 +47,12 @@ class _HoverAnimatedButtonState extends State<HoverAnimatedButton> {
               width: 250,
               height: 50,
               child: ElevatedButton(
-                onPressed: widget.onPressed,
+                onPressed: disabled ? null : widget.onPressed,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Colors.white, // texto SIEMPRE blanco
+                  disabledForegroundColor: Colors.white.withOpacity(0.9),
+                  disabledBackgroundColor: Colors.transparent,
                   elevation: 0,
                   shadowColor: Colors.transparent,
                   padding: const EdgeInsets.symmetric(
@@ -57,12 +63,26 @@ class _HoverAnimatedButtonState extends State<HoverAnimatedButton> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
-                  widget.text,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Oxanium',
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (widget.loading) ...[
+                      const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                    Text(
+                      widget.text,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Oxanium',
+                        color: Colors.white, // refuerzo
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

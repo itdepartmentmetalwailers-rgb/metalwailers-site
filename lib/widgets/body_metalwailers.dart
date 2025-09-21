@@ -65,7 +65,7 @@ class BodyMetalWailers extends StatelessWidget {
                 imagePath: item['image']!,
                 extraDescription: item['extraDescription']!,
                 scrollController: scrollController,
-                imageHoverPath: item['imageHover']!,  
+                imageHoverPath: item['imageHover']!,
               );
             }).toList(),
       ),

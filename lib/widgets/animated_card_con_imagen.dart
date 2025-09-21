@@ -220,81 +220,78 @@ class _AnimatedCardConImagenState extends State<AnimatedCardConImagen>
     );
   }
 
- Widget _buildCardContent() {
-  return GestureDetector(
-    onTap: _toggleExpand,
-    child: MouseRegion(
-      onEnter: (_) => setState(() => _hoverActivo = true),
-      onExit: (_) => setState(() => _hoverActivo = false),
-      cursor: SystemMouseCursors.click,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 24),
-        padding: const EdgeInsets.all(16),
-        transform: _hoverActivo
-            ? Matrix4.translationValues(0, -6, 0)
-            : Matrix4.identity(),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: _hoverActivo
-              ? Colors.grey.shade400
-              : Colors.grey.shade200,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-         
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                      color: _hoverActivo ? Colors.black : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.description,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                fontWeight: FontWeight.w400
-
-                    ),
-                  ),
-                  AnimatedSize(
-  duration: const Duration(milliseconds: 300),
-  curve: Curves.easeOut,
-  child: _expandida
-      ? AnimatedOpacity(
-          opacity: _mostrarDescripcionExtra ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 300),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Text(
-              widget.extraDescription,
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.black,
-                fontWeight: FontWeight.w400
-              ),
-            ),
+  Widget _buildCardContent() {
+    return GestureDetector(
+      onTap: _toggleExpand,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hoverActivo = true),
+        onExit: (_) => setState(() => _hoverActivo = false),
+        cursor: SystemMouseCursors.click,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.only(bottom: 24),
+          padding: const EdgeInsets.all(16),
+          transform:
+              _hoverActivo
+                  ? Matrix4.translationValues(0, -6, 0)
+                  : Matrix4.identity(),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: _hoverActivo ? Colors.grey.shade400 : Colors.grey.shade200,
           ),
-        )
-      : const SizedBox.shrink(),
-),
-
-                ],
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        color: _hoverActivo ? Colors.black : Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.description,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                      child:
+                          _expandida
+                              ? AnimatedOpacity(
+                                opacity: _mostrarDescripcionExtra ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+                                  child: Text(
+                                    widget.extraDescription,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              : const SizedBox.shrink(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
-    }

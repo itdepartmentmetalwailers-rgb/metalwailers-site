@@ -280,7 +280,7 @@ class _NavTextButtonState extends State<_NavTextButton> {
   double _calcularAnchoTexto(BuildContext context, String texto) {
     final size = MediaQuery.of(context).size;
     final isWide = size.width > 800;
-    
+
     final TextPainter textPainter = TextPainter(
       text: TextSpan(
         text: texto,

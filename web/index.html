@@ -11,6 +11,39 @@
   })(window,document,'script','dataLayer','GTM-MJP9DZHK');</script>
   <!-- End Google Tag Manager -->
 
+  <!-- Debug: log de dataLayer -->
+  <script>
+    window.__GTM_DEBUG = true;
+    (function () {
+      window.dataLayer = window.dataLayer || [];
+      const _push = dataLayer.push;
+      dataLayer.push = function () {
+        const evt = arguments[0];
+        if (window.__GTM_DEBUG) console.log('[GTM:dataLayer.push]', evt);
+        return _push.apply(this, arguments);
+      };
+    })();
+  </script>
+
+  <!-- Conversion helper para GTM (Google Ads via dataLayer) -->
+  <script>
+    // Llamá a gtag_report_conversion('/gracias') cuando se envía el formulario
+    function gtag_report_conversion(url) {
+      if (window.__GTM_DEBUG) console.log('[GTM:conversion] firing…');
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'conversion',  // Custom Event que disparará la etiqueta en GTM
+        conversion_send_to: 'AW-17585177806/HI5BCJvxwZ4bEM6JosFB',
+        value: 1.0,
+        currency: 'ARS',
+        event_callback: function () {
+          if (typeof url !== 'undefined') window.location = url;
+        }
+      });
+      return false;
+    }
+  </script>
+
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +53,7 @@
   <meta name="author" content="MetalWailers">
   <meta name="robots" content="index, follow">
 
-  <!-- Etiquetas canónicas para cada ruta -->
+  <!-- Etiqueta canónica por defecto (la ajustamos más abajo) -->
   <link rel="canonical" href="https://metalwailers.com/">
 
   <!-- iOS meta tags & icons -->

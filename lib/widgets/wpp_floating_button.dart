@@ -28,8 +28,6 @@ class _WhatsappFloatingButtonState extends State<WhatsappFloatingButton> {
 
   @override
   Widget build(BuildContext context) {
-
-
     final icono = AnimatedScale(
       scale: _esWebDesktop && _isHovered ? 2.0 : 1.4,
       duration: const Duration(milliseconds: 200),

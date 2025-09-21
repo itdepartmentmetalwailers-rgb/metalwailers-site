@@ -3,6 +3,47 @@
 <head>
   <base href="/">
 
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-MJP9DZHK');</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Debug: log de dataLayer -->
+  <script>
+    window.__GTM_DEBUG = true;
+    (function () {
+      window.dataLayer = window.dataLayer || [];
+      const _push = dataLayer.push;
+      dataLayer.push = function () {
+        const evt = arguments[0];
+        if (window.__GTM_DEBUG) console.log('[GTM:dataLayer.push]', evt);
+        return _push.apply(this, arguments);
+      };
+    })();
+  </script>
+
+  <!-- Conversion helper para GTM (Google Ads via dataLayer) -->
+  <script>
+    // Llamá a gtag_report_conversion('/gracias') cuando se envía el formulario
+    function gtag_report_conversion(url) {
+      if (window.__GTM_DEBUG) console.log('[GTM:conversion] firing…');
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'conversion',  // Custom Event que disparará la etiqueta en GTM
+        conversion_send_to: 'AW-17585177806/HI5BCJvxwZ4bEM6JosFB',
+        value: 1.0,
+        currency: 'ARS',
+        event_callback: function () {
+          if (typeof url !== 'undefined') window.location = url;
+        }
+      });
+      return false;
+    }
+  </script>
+
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +52,9 @@
   <meta name="keywords" content="Metalúrgica, Herrería, Industrial, Fabricación en serie, Metal, Piezas, Estructuras, Soldadura, MIG, TIG, Plegado, Chapa, Plasma, Punzonado, Curvado, Caños, Corte CNC, Hierro, Inoxidable, Pintura a horno, Balancinado, Guillotinado">
   <meta name="author" content="MetalWailers">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://www.metalwailers.com/">
+
+  <!-- Etiqueta canónica por defecto (la ajustamos más abajo) -->
+  <link rel="canonical" href="https://metalwailers.com/">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -26,6 +69,33 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MJP9DZHK"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <script>
+    const path = window.location.pathname;
+    const head = document.getElementsByTagName('head')[0];
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      head.appendChild(canonical);
+    }
+    if (path === '/' || path === '') {
+      canonical.setAttribute('href', 'https://metalwailers.com/');
+    } else if (path.startsWith('/sobre-nosotros')) {
+      canonical.setAttribute('href', 'https://metalwailers.com/sobre-nosotros');
+    } else if (path.startsWith('/servicios')) {
+      canonical.setAttribute('href', 'https://metalwailers.com/servicios');
+    } else if (path.startsWith('/contacto')) {
+      canonical.setAttribute('href', 'https://metalwailers.com/contacto');
+    } else {
+      canonical.setAttribute('href', 'https://metalwailers.com/');
+    }
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

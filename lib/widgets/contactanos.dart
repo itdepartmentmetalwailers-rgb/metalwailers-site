@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:convert';
-import 'dart:js' as js; // para llamar gtag_report_conversion en web
+import 'dart:js' as dartJs; // GTM (web)
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -29,7 +29,7 @@ class _ContactanosState extends State<Contactanos>
   final _rubroController = TextEditingController();
   final _comentariosController = TextEditingController();
 
-  // FocusNodes (para autovalidar solo el campo tocado)
+  // FocusNodes
   final _fnName = FocusNode();
   final _fnEmail = FocusNode();
   final _fnPhone = FocusNode();
@@ -38,7 +38,7 @@ class _ContactanosState extends State<Contactanos>
 
   late final AnimationController _lottieCtrl;
 
-  // Flags de autovalidación por campo
+  // Flags de autovalidación
   bool _avName = false,
       _avEmail = false,
       _avPhone = false,
@@ -49,14 +49,12 @@ class _ContactanosState extends State<Contactanos>
   String? selectedServicio;
   bool _sending = false;
 
-  // Regex email simple/efectiva
-  static final _emailRegExp = RegExp(
-    r"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$",
-    caseSensitive: false,
-  );
+  // Regex email
+  static final _emailRegExp =
+      RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$', caseSensitive: false);
 
-  // Para contar dígitos del teléfono
-  static final _phoneDigits = RegExp(r"\d");
+  // Contar dígitos del teléfono
+  static final _phoneDigits = RegExp(r'\d');
 
   @override
   void initState() {
@@ -107,9 +105,8 @@ class _ContactanosState extends State<Contactanos>
     required String rubro,
     required String comentarios,
   }) async {
-    final functionUrl = Uri.parse(
-      'https://metalwailers-mail-9556.twil.io/send-email',
-    );
+    final functionUrl =
+        Uri.parse('https://metalwailers-mail-9556.twil.io/send-email');
     final headers = {'Content-Type': 'application/json'};
 
     final r = await http.post(
@@ -134,31 +131,35 @@ class _ContactanosState extends State<Contactanos>
   void _pushGtmEvent(String event, Map<String, dynamic> data) {
     final payload = {'event': event, ...data};
 
-    // print siempre funciona
     // ignore: avoid_print
     print('[GTM] push $payload');
 
-    try {
-      // dataLayer.push
-      final jsPayload = js.JsObject.jsify(payload);
-      final dl = js.context['dataLayer'];
-      if (dl == null) {
-        js.context['dataLayer'] = js.JsArray();
-        (js.context['dataLayer'] as js.JsObject).callMethod('push', [
-          jsPayload,
-        ]);
-      } else {
-        (dl as js.JsObject).callMethod('push', [jsPayload]);
-      }
-    } catch (_) {}
+    if (!kIsWeb) return;
 
-    // console.log seguro
     try {
-      final console = js.context['console'];
-      if (console is js.JsObject) {
-        console.callMethod('log', ['[GTM] push', js.JsObject.jsify(payload)]);
+      dynamic dl;
+      try {
+        dl = dartJs.context['dataLayer'];
+      } catch (_) {
+        dl = null;
       }
-    } catch (_) {}
+
+      if (dl == null) {
+        dartJs.context.callMethod('console.log',
+            const ['[GTM] dataLayer not found (local / early load)']);
+        return;
+      }
+
+      if (dl is dartJs.JsObject) {
+        dl.callMethod('push', [dartJs.JsObject.jsify(payload)]);
+      } else {
+        dartJs.context.callMethod('console.log',
+            const ['[GTM] dataLayer exists but is not a JsObject']);
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('[GTM] Error pushing event: $e');
+    }
   }
 
   Future<void> _showSuccessDialog() async {
@@ -171,9 +172,8 @@ class _ContactanosState extends State<Contactanos>
         return WillPopScope(
           onWillPop: () async => false,
           child: Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -186,17 +186,14 @@ class _ContactanosState extends State<Contactanos>
                       'assets/lottie/success.json',
                       controller: _lottieCtrl,
                       onLoaded: (comp) {
-                        // Duración máxima de visualización: 4s
                         const maxWait = Duration(seconds: 4);
                         final animDuration = comp.duration;
                         final playFor =
                             animDuration > maxWait ? maxWait : animDuration;
 
                         _lottieCtrl.duration = playFor;
-                        // 🔧 forward SOLO una vez
                         final forwardFuture = _lottieCtrl.forward();
 
-                        // Cerrar cuando termine (o a los 4s, lo que ocurra primero)
                         Future.any([
                           forwardFuture,
                           Future.delayed(playFor),
@@ -212,7 +209,8 @@ class _ContactanosState extends State<Contactanos>
                   const SizedBox(height: 8),
                   const Text(
                     '¡Gracias por contactarte!',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 6),
@@ -259,12 +257,10 @@ class _ContactanosState extends State<Contactanos>
   }
 
   Future<void> _onSubmit() async {
-    // Si no es válido, mostrar errores de TODOS (por única vez) y salir
     if (!(_formKey.currentState!.validate()) || selectedServicio == null) {
       setState(() {
         _avName =
-            _avEmail =
-                _avPhone = _avRubro = _avComentarios = _avServicio = true;
+            _avEmail = _avPhone = _avRubro = _avComentarios = _avServicio = true;
       });
       return;
     }
@@ -280,14 +276,12 @@ class _ContactanosState extends State<Contactanos>
         comentarios: _comentariosController.text.trim(),
       );
 
-      // Dispara conversión (solo web)
       if (kIsWeb) {
         try {
-          js.context.callMethod('gtag_report_conversion', ['/gracias']);
+          dartJs.context.callMethod('gtag_report_conversion', ['/gracias']);
         } catch (_) {}
       }
 
-      // Evento de marketing + console.log
       _pushGtmEvent('social_click', {
         'social_network': 'form',
         'social_action': 'submit',
@@ -312,49 +306,49 @@ class _ContactanosState extends State<Contactanos>
     }
   }
 
-  /// ------- BUILD con Enter global -------
-  @override
-  Widget build(BuildContext context) {
-    return Shortcuts(
-      shortcuts: <LogicalKeySet, Intent>{
-        LogicalKeySet(LogicalKeyboardKey.enter): const ActivateIntent(),
-        LogicalKeySet(LogicalKeyboardKey.numpadEnter): const ActivateIntent(),
+ @override
+Widget build(BuildContext context) {
+  return Shortcuts(
+    shortcuts: <LogicalKeySet, Intent>{
+      LogicalKeySet(LogicalKeyboardKey.enter): const ActivateIntent(),
+      LogicalKeySet(LogicalKeyboardKey.numpadEnter): const ActivateIntent(),
+    },
+    child: Actions(
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (intent) {
+            // No enviar si el foco está en Comentarios (Enter = nueva línea)
+            if (!_fnComentarios.hasFocus && !_sending) {
+              _onSubmit();
+            }
+            return null;
+          },
+        ),
       },
-      child: Actions(
-        actions: <Type, Action<Intent>>{
-          ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (intent) {
-              // No enviar si el foco está en Comentarios (Enter = nueva línea)
-              if (!_fnComentarios.hasFocus && !_sending) {
-                _onSubmit();
-              }
-              return null;
-            },
-          ),
-        },
-        child: const Focus(autofocus: true, child: SizedBox()),
-      ),
-    ).copyWithChild(_buildContent());
-  }
+      // 👇 Acá va directamente tu contenido
+      child: _buildContent(),
+    ),
+  );
+}
 
-  /// Contenido original (Row/Column segun ancho)
+
   Widget _buildContent() {
     final size = MediaQuery.of(context).size;
     final isWide = size.width > 800;
 
     return isWide
         ? Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: _leftColumn()),
-            const SizedBox(width: 40),
-            Expanded(child: _rightColumn()),
-          ],
-        )
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: _leftColumn()),
+              const SizedBox(width: 40),
+              Expanded(child: _rightColumn()),
+            ],
+          )
         : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_leftColumn(), const SizedBox(height: 32), _rightColumn()],
-        );
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [_leftColumn(), const SizedBox(height: 32), _rightColumn()],
+          );
   }
 
   Widget _leftColumn() {
@@ -424,149 +418,129 @@ class _ContactanosState extends State<Contactanos>
     ];
 
     return StatefulBuilder(
-      builder:
-          (context, setStateSB) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 50),
-              const Text(
-                'Hablemos de tu Proyecto',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "¿Tenés una idea o necesitás una solución concreta? Te ayudamos a llevarla a cabo",
-                textAlign: TextAlign.justify,
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
-              const SizedBox(height: 24),
-
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    _inputField(
-                      controller: _nameController,
-                      label: 'Nombre y Apellido / Empresa',
-                      validator: _required,
-                      focusNode: _fnName,
-                      autovalidate: _avName,
-                      textInputAction: TextInputAction.next,
-                      onSubmitted: () => _fnEmail.requestFocus(),
-                    ),
-                    const SizedBox(height: 16),
-
-                    _inputField(
-                      controller: _emailController,
-                      label: 'Correo Electrónico',
-                      keyboardType: TextInputType.emailAddress,
-                      validator: _emailValidator,
-                      focusNode: _fnEmail,
-                      autovalidate: _avEmail,
-                      textInputAction: TextInputAction.next,
-                      onSubmitted: () => _fnPhone.requestFocus(),
-                    ),
-                    const SizedBox(height: 16),
-
-                    _inputField(
-                      controller: _phoneController,
-                      label: 'Teléfono de contacto',
-                      keyboardType: TextInputType.phone,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: _phoneValidator,
-                      focusNode: _fnPhone,
-                      autovalidate: _avPhone,
-                      textInputAction: TextInputAction.next,
-                      onSubmitted: () => _fnRubro.requestFocus(),
-                    ),
-                    const SizedBox(height: 16),
-
-                    DropdownButtonFormField<String>(
-                      value: selectedServicio,
-                      autovalidateMode:
-                          _avServicio
-                              ? AutovalidateMode.always
-                              : AutovalidateMode.disabled,
-                      onChanged: (value) {
-                        setStateSB(() {
-                          selectedServicio = value;
-                          _avServicio =
-                              true; // desde que lo tocan, valida solo él
-                        });
-                      },
-                      decoration: const InputDecoration(
-                        labelText: '¿Qué servicio estás buscando?',
-                        labelStyle: TextStyle(color: Colors.black),
-                        border: OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                      ),
-                      style: const TextStyle(color: Colors.black),
-                      validator:
-                          (v) =>
-                              (v == null || v.isEmpty)
-                                  ? 'Este campo es requerido'
-                                  : null,
-                      items:
-                          servicios
-                              .map(
-                                (s) =>
-                                    DropdownMenuItem(value: s, child: Text(s)),
-                              )
-                              .toList(),
-                    ),
-                    const SizedBox(height: 16),
-
-                    _inputField(
-                      controller: _rubroController,
-                      label: 'Rubro o industria de tu proyecto',
-                      validator: _required,
-                      focusNode: _fnRubro,
-                      autovalidate: _avRubro,
-                      textInputAction: TextInputAction.next,
-                      onSubmitted: () => _fnComentarios.requestFocus(),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Multiline + newline en comentarios
-                    _inputField(
-                      controller: _comentariosController,
-                      label: 'Comentarios / Consulta específica',
-                      keyboardType: TextInputType.multiline,
-                      maxLines: 5,
-                      validator: _required,
-                      focusNode: _fnComentarios,
-                      autovalidate: _avComentarios,
-                      textInputAction:
-                          TextInputAction.newline, // Enter = salto de línea
-                    ),
-                    const SizedBox(height: 24),
-
-                    HoverAnimatedButton(
-                      onPressed:
-                          _sending
-                              ? null
-                              : () {
-                                _onSubmit();
-                              },
-                      text: _sending ? "Enviando..." : "Enviar consulta",
-                      loading: _sending,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 50),
-            ],
+      builder: (context, setStateSB) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 50),
+          const Text(
+            'Hablemos de tu Proyecto',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
+          const SizedBox(height: 8),
+          const Text(
+            "¿Tenés una idea o necesitás una solución concreta? Te ayudamos a llevarla a cabo",
+            textAlign: TextAlign.justify,
+            style: TextStyle(fontSize: 16, color: Colors.black),
+          ),
+          const SizedBox(height: 24),
+
+          Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _inputField(
+                  controller: _nameController,
+                  label: 'Nombre y Apellido / Empresa',
+                  validator: _required,
+                  focusNode: _fnName,
+                  autovalidate: _avName,
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: () => _fnEmail.requestFocus(),
+                ),
+                const SizedBox(height: 16),
+
+                _inputField(
+                  controller: _emailController,
+                  label: 'Correo Electrónico',
+                  keyboardType: TextInputType.emailAddress,
+                  validator: _emailValidator,
+                  focusNode: _fnEmail,
+                  autovalidate: _avEmail,
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: () => _fnPhone.requestFocus(),
+                ),
+                const SizedBox(height: 16),
+
+                _inputField(
+                  controller: _phoneController,
+                  label: 'Teléfono de contacto',
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  validator: _phoneValidator,
+                  focusNode: _fnPhone,
+                  autovalidate: _avPhone,
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: () => _fnRubro.requestFocus(),
+                ),
+                const SizedBox(height: 16),
+
+                DropdownButtonFormField<String>(
+                  value: selectedServicio,
+                  autovalidateMode:
+                      _avServicio ? AutovalidateMode.always : AutovalidateMode.disabled,
+                  onChanged: (value) {
+                    setStateSB(() {
+                      selectedServicio = value;
+                      _avServicio = true;
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: '¿Qué servicio estás buscando?',
+                    labelStyle: TextStyle(color: Colors.black),
+                    border: OutlineInputBorder(),
+                    enabledBorder:
+                        OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                    focusedBorder:
+                        OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                  ),
+                  style: const TextStyle(color: Colors.black),
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? 'Este campo es requerido' : null,
+                  items: servicios
+                      .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                      .toList(),
+                ),
+                const SizedBox(height: 16),
+
+                _inputField(
+                  controller: _rubroController,
+                  label: 'Rubro o industria de tu proyecto',
+                  validator: _required,
+                  focusNode: _fnRubro,
+                  autovalidate: _avRubro,
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: () => _fnComentarios.requestFocus(),
+                ),
+                const SizedBox(height: 16),
+
+                _inputField(
+                  controller: _comentariosController,
+                  label: 'Comentarios / Consulta específica',
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 5,
+                  validator: _required,
+                  focusNode: _fnComentarios,
+                  autovalidate: _avComentarios,
+                  textInputAction: TextInputAction.newline,
+                ),
+                const SizedBox(height: 24),
+
+                HoverAnimatedButton(
+                  onPressed: _sending ? null : () => _onSubmit(),
+                  text: _sending ? "Enviando..." : "Enviar consulta",
+                  loading: _sending,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 50),
+        ],
+      ),
     );
   }
 
@@ -596,12 +570,10 @@ class _ContactanosState extends State<Contactanos>
       decoration: const InputDecoration(
         labelStyle: TextStyle(color: Colors.black),
         border: OutlineInputBorder(),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black),
-        ),
+        enabledBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+        focusedBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
         errorMaxLines: 2,
       ).copyWith(labelText: label),
       validator: validator ?? _required,
@@ -609,13 +581,7 @@ class _ContactanosState extends State<Contactanos>
   }
 }
 
-/// Pequeña extensión para incrustar un child real dentro del árbol de Shortcuts/Actions
-extension _WithChild on Widget {
-  Widget copyWithChild(Widget child) {
-    return Stack(children: [this, child]);
-  }
-}
-
+// ====== Cards de la columna izquierda ======
 class _InfoCard extends StatefulWidget {
   final String title;
   final String subtitle;
@@ -636,6 +602,44 @@ class _InfoCard extends StatefulWidget {
 class _InfoCardState extends State<_InfoCard> {
   bool _isHover = false;
 
+  String _detectEvent() {
+    final t = widget.title.toLowerCase();
+    if (t.contains('whatsapp')) return 'whatsapp_click';
+    if (t.contains('email')) return 'email_click';
+    if (t.contains('dirección')) return 'address_click';
+    if (t.contains('instagram')) return 'instagram_click';
+    return 'social_click';
+  }
+
+  void _gtmPush(String event, Map<String, dynamic> data) {
+    final payload = {'event': event, ...data};
+    // ignore: avoid_print
+    print('[GTM] push $payload');
+    if (!kIsWeb) return;
+    try {
+      dynamic dl;
+      try {
+        dl = dartJs.context['dataLayer'];
+      } catch (_) {
+        dl = null;
+      }
+      if (dl == null) {
+        dartJs.context.callMethod('console.log',
+            const ['[GTM] dataLayer not found (local / early load)']);
+        return;
+      }
+      if (dl is dartJs.JsObject) {
+        dl.callMethod('push', [dartJs.JsObject.jsify(payload)]);
+      } else {
+        dartJs.context.callMethod('console.log',
+            const ['[GTM] dataLayer exists but is not a JsObject']);
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('[GTM] Error pushing event: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -643,15 +647,16 @@ class _InfoCardState extends State<_InfoCard> {
       onEnter: (_) => setState(() => _isHover = true),
       onExit: (_) => setState(() => _isHover = false),
       child: GestureDetector(
-        onTap: () => launchUrl(Uri.parse(widget.url)),
+        onTap: () {
+          _gtmPush(_detectEvent(), {'location': 'contact_section'});
+          launchUrl(Uri.parse(widget.url));
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.only(bottom: 24),
           padding: const EdgeInsets.all(16),
           transform:
-              _isHover
-                  ? Matrix4.translationValues(0, -6, 0)
-                  : Matrix4.identity(),
+              _isHover ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: _isHover ? Colors.grey.shade400 : Colors.grey.shade200,
@@ -659,11 +664,8 @@ class _InfoCardState extends State<_InfoCard> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                widget.icon,
-                color: _isHover ? Colors.black : Colors.black87,
-                size: 28,
-              ),
+              Icon(widget.icon,
+                  color: _isHover ? Colors.black : Colors.black87, size: 28),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -678,13 +680,9 @@ class _InfoCardState extends State<_InfoCard> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      widget.subtitle,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    Text(widget.subtitle,
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.black87)),
                   ],
                 ),
               ),

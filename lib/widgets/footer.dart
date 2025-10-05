@@ -1,3 +1,5 @@
+import 'dart:js' as dartJs;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,6 +9,37 @@ import 'package:url_launcher/url_launcher.dart';
 class Footer extends StatelessWidget {
   const Footer({super.key});
 
+  // ===== Helper GTM seguro =====
+  void _gtmPush(String event, Map<String, dynamic> data) {
+    final payload = {'event': event, ...data};
+    // ignore: avoid_print
+    print('[GTM] push $payload');
+    if (!kIsWeb) return;
+    try {
+      dynamic dl;
+      try {
+        dl = dartJs.context['dataLayer'];
+      } catch (_) {
+        dl = null;
+      }
+      if (dl == null) {
+        dartJs.context.callMethod('console.log',
+            const ['[GTM] dataLayer not found (local / early load)']);
+        return;
+      }
+      if (dl is dartJs.JsObject) {
+        dl.callMethod('push', [dartJs.JsObject.jsify(payload)]);
+      } else {
+        dartJs.context.callMethod('console.log',
+            const ['[GTM] dataLayer exists but is not a JsObject']);
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('[GTM] Error pushing event: $e');
+    }
+  }
+  // =============================
+
   @override
   Widget build(BuildContext context) {
     final isWide = MediaQuery.of(context).size.width > 800;
@@ -15,10 +48,7 @@ class Footer extends StatelessWidget {
     return Container(
       color: Colors.black,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      child:
-          isWide
-              ? _buildWideLayout(textColor, context)
-              : _buildNarrowLayout(textColor, context),
+      child: isWide ? _buildWideLayout(textColor, context) : _buildNarrowLayout(textColor, context),
     );
   }
 
@@ -39,7 +69,6 @@ class Footer extends StatelessWidget {
       children: [
         _logoColumn(textColor, context),
         const SizedBox(height: 24),
-
         _contactColumn(textColor),
       ],
     );
@@ -71,15 +100,14 @@ class Footer extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children:
-              links
-                  .map(
-                    (link) => _HoverUnderlineText(
-                      label: link['label']!,
-                      onTap: () => context.go(link['route']!),
-                    ),
-                  )
-                  .toList(),
+          children: links
+              .map(
+                (link) => _HoverUnderlineText(
+                  label: link['label']!,
+                  onTap: () => context.go(link['route']!),
+                ),
+              )
+              .toList(),
         ),
       ),
     );
@@ -88,42 +116,30 @@ class Footer extends StatelessWidget {
   Widget _contactColumn(Color textColor) {
     return Center(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center, // <- aquí el cambio
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _contactItem(
-            FontAwesomeIcons.whatsapp,
-            '1162913437',
-            'https://wa.me/5491141941235',
-            textColor,
-          ),
-          _contactItem(
-            Icons.mail,
-            'metalwailerscomercial@gmail.com',
-            'mailto:metalwailerscomercial@gmail.com',
-            textColor,
-          ),
-          _contactItem(
-            Icons.location_on,
-            'GORRITI 1399, EL TALAR, TIGRE, PROV. BS.AS.',
-            'https://www.google.com/maps/place/GORRITI+1399,+El+Talar',
-            textColor,
-          ),
-          _contactItem(
-            FontAwesomeIcons.instagram,
-            'metalwailers',
-            'https://www.instagram.com/metalwailers',
-            textColor,
-          ),
+          _contactItem(FontAwesomeIcons.whatsapp, '1162913437',
+              'https://wa.me/5491141941235', textColor, 'whatsapp_click'),
+          _contactItem(Icons.mail, 'metalwailerscomercial@gmail.com',
+              'mailto:metalwailerscomercial@gmail.com', textColor, 'email_click'),
+          _contactItem(Icons.location_on,
+              'GORRITI 1399, EL TALAR, TIGRE, PROV. BS.AS.',
+              'https://www.google.com/maps/place/GORRITI+1399,+El+Talar', textColor, 'address_click'),
+          _contactItem(FontAwesomeIcons.instagram, 'metalwailers',
+              'https://www.instagram.com/metalwailers', textColor, 'instagram_click'),
         ],
       ),
     );
   }
 
-  Widget _contactItem(IconData icon, String label, String url, Color color) {
+  Widget _contactItem(
+      IconData icon, String label, String url, Color color, String eventName) {
     return InkWell(
-      onTap:
-          () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+      onTap: () async {
+        _gtmPush(eventName, {'location': 'footer'});
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
@@ -145,7 +161,6 @@ double getTextWidth(String text, TextStyle style) {
     text: TextSpan(text: text, style: style),
     textDirection: TextDirection.ltr,
   )..layout();
-
   return painter.width;
 }
 
@@ -175,20 +190,13 @@ class _HoverUnderlineTextState extends State<_HoverUnderlineText> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                widget.label,
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
+              const Text('',
+                  style: TextStyle(color: Colors.transparent, fontSize: 0)), // placeholder safe
+              Text(widget.label, style: const TextStyle(color: Colors.white, fontSize: 16)),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 height: 2,
-                width:
-                    _hover
-                        ? getTextWidth(
-                          widget.label,
-                          TextStyle(color: Colors.white, fontSize: 17),
-                        )
-                        : 0,
+                width: _hover ? getTextWidth(widget.label, const TextStyle(color: Colors.white, fontSize: 17)) : 0,
                 color: Colors.white,
               ),
             ],

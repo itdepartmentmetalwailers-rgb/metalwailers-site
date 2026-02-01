@@ -13,7 +13,7 @@ class TestMailButton extends StatelessWidget {
       Uri.parse(functionUrl),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'to': 'manunv97@gmail.com',
+        'to': 'metalwailerscomercial@gmail.com',
         'subject': '📩 123',
         'text': '123 🛠️',
       }),

@@ -361,9 +361,9 @@ Widget build(BuildContext context) {
       ],
       [
         'Email',
-        'metalwailerscomercial@gmail.com',
+        'contacto@metalwailers.com',
         FontAwesomeIcons.envelope,
-        'mailto:metalwailerscomercial@gmail.com',
+        'mailto:contacto@metalwailers.com',
       ],
       [
         'Dirección',

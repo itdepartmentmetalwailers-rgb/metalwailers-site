@@ -121,8 +121,8 @@ class Footer extends StatelessWidget {
         children: [
           _contactItem(FontAwesomeIcons.whatsapp, '1162913437',
               'https://wa.me/5491141941235', textColor, 'whatsapp_click'),
-          _contactItem(Icons.mail, 'metalwailerscomercial@gmail.com',
-              'mailto:metalwailerscomercial@gmail.com', textColor, 'email_click'),
+          _contactItem(Icons.mail, 'contacto@metalwailers.com',
+              'mailto:contacto@metalwailers.com', textColor, 'email_click'),
           _contactItem(Icons.location_on,
               'GORRITI 1399, EL TALAR, TIGRE, PROV. BS.AS.',
               'https://www.google.com/maps/place/GORRITI+1399,+El+Talar', textColor, 'address_click'),

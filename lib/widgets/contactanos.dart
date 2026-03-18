@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:lottie/lottie.dart';
 import 'package:metalwailers/widgets/animated_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -18,8 +17,7 @@ class Contactanos extends StatefulWidget {
   State<Contactanos> createState() => _ContactanosState();
 }
 
-class _ContactanosState extends State<Contactanos>
-    with SingleTickerProviderStateMixin {
+class _ContactanosState extends State<Contactanos> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
@@ -35,8 +33,6 @@ class _ContactanosState extends State<Contactanos>
   final _fnPhone = FocusNode();
   final _fnRubro = FocusNode();
   final _fnComentarios = FocusNode();
-
-  late final AnimationController _lottieCtrl;
 
   // Flags de autovalidación
   bool _avName = false,
@@ -60,8 +56,6 @@ class _ContactanosState extends State<Contactanos>
   void initState() {
     super.initState();
 
-    _lottieCtrl = AnimationController(vsync: this);
-
     _fnName.addListener(() {
       if (!_fnName.hasFocus) setState(() => _avName = true);
     });
@@ -81,8 +75,6 @@ class _ContactanosState extends State<Contactanos>
 
   @override
   void dispose() {
-    _lottieCtrl.dispose();
-
     _fnName.dispose();
     _fnEmail.dispose();
     _fnPhone.dispose();
@@ -163,62 +155,94 @@ class _ContactanosState extends State<Contactanos>
   }
 
   Future<void> _showSuccessDialog() async {
-    _lottieCtrl.reset();
-
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) {
+      builder: (dialogContext) {
+        final screenW = MediaQuery.sizeOf(dialogContext).width;
+        const maxCard = 400.0;
+        // insetPadding 20+20 + un poco de aire
+        final cardW = (screenW - 48) < maxCard ? screenW - 48 : maxCard;
+
         return WillPopScope(
           onWillPop: () async => false,
           child: Dialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
+            backgroundColor: Colors.white,
+            elevation: 20,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: SizedBox(
+              width: cardW,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 26, 24, 18),
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
-                    width: 160,
-                    height: 160,
-                    child: Lottie.asset(
-                      'assets/lottie/success.json',
-                      controller: _lottieCtrl,
-                      onLoaded: (comp) {
-                        const maxWait = Duration(seconds: 4);
-                        final animDuration = comp.duration;
-                        final playFor =
-                            animDuration > maxWait ? maxWait : animDuration;
-
-                        _lottieCtrl.duration = playFor;
-                        final forwardFuture = _lottieCtrl.forward();
-
-                        Future.any([
-                          forwardFuture,
-                          Future.delayed(playFor),
-                        ]).whenComplete(() {
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
-                          }
-                        });
-                      },
-                      repeat: false,
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF111827), Color(0xFF374151)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 42,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 18),
                   const Text(
-                    '¡Gracias por contactarte!',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    'Consulta enviada',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                      color: Color(0xFF111827),
+                    ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
                   const Text(
-                    'Recibimos tu consulta y te responderemos a la brevedad.',
+                    'Gracias por contactarte con Metalwailers. Nuestro equipo te respondera a la brevedad.',
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.45,
+                      color: Color(0xFF4B5563),
+                    ),
                     textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF111827),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Perfecto',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
+                ),
               ),
             ),
           ),

@@ -98123,7 +98123,7 @@ L(a){var s,r=this,q=A.a9([A.aO5(B.fq),B.jG,A.aO5(B.ig),B.jG],t.Qw,t.F),p=A.a9([B
 o.toString
 s=t.p
 return A.V8(A.oy(p,A.bn(o,null,t.w).w.a.a>800?A.ha(A.b([A.lB(r.SR()),B.VO,A.lB(r.Uq())],s),B.a0,B.w,B.D):A.cI(A.b([r.SR(),B.mf,r.Uq()],s),B.a0,B.w,B.D)),null,q)},
-SR(){var s=t.jl,r=A.b([A.b(["Whatsapp","1162913437",B.fe,"https://wa.me/5491162913437"],s),A.b(["Email","metalwailerscomercial@gmail.com",B.KV,"mailto:metalwailerscomercial@gmail.com"],s),A.b(["Direcci\xf3n",u.f,B.KW,u.W],s),A.b(["Instagram","@metalwailers",B.i1,"https://www.instagram.com/metalwailers"],s)],t.EY)
+SR(){var s=t.jl,r=A.b([A.b(["Whatsapp","1162913437",B.fe,"https://wa.me/5491162913437"],s),A.b(["Email","contacto@metalwailers.com",B.KV,"mailto:contacto@metalwailers.com"],s),A.b(["Direcci\xf3n",u.f,B.KW,u.W],s),A.b(["Instagram","@metalwailers",B.i1,"https://www.instagram.com/metalwailers"],s)],t.EY)
 s=A.b([B.ev,B.a0D,B.du],t.p)
 B.b.G(s,new A.a_(r,new A.avO(),t.wS))
 return A.cI(s,B.a0,B.w,B.D)},
@@ -98352,7 +98352,7 @@ aiN(a,b){var s=null,r=t.N,q=t.Jk
 r=A.U(new A.a_(A.b([A.a9(["label","Inicio","route","/"],r,r),A.a9(["label","Sobre nosotros","route","/sobre-nosotros"],r,r),A.a9(["label","Servicios","route","/servicios"],r,r),A.a9(["label","Contacto","route","/contacto"],r,r)],t.m0),new A.ads(b),q),q.h("aq.E"))
 return A.e9(new A.c7(B.Kf,A.cI(r,B.a0,B.w,B.D),s),B.aM,s,s,s,s)},
 Qa(a){var s=this
-return A.ls(A.cI(A.b([s.yR(B.fe,"1162913437","https://wa.me/5491141941235",a,"whatsapp_click"),s.yR(B.L6,"metalwailerscomercial@gmail.com","mailto:metalwailerscomercial@gmail.com",a,"email_click"),s.yR(B.L5,u.f,u.W,a,"address_click"),s.yR(B.i1,"metalwailers","https://www.instagram.com/metalwailers",a,"instagram_click")],t.p),B.W,B.e8,B.D),null,null)},
+return A.ls(A.cI(A.b([s.yR(B.fe,"1162913437","https://wa.me/5491141941235",a,"whatsapp_click"),s.yR(B.L6,"contacto@metalwailers.com","mailto:contacto@metalwailers.com",a,"email_click"),s.yR(B.L5,u.f,u.W,a,"address_click"),s.yR(B.i1,"metalwailers","https://www.instagram.com/metalwailers",a,"instagram_click")],t.p),B.W,B.e8,B.D),null,null)},
 yR(a,b,c,d,e){var s=null
 return A.afH(!1,s,!0,new A.c7(B.K_,A.ha(A.b([A.wV(a,d,s,18),B.B1,new A.CN(1,B.KA,A.cq(b,s,s,s,A.du(s,s,d,s,s,s,s,s,s,s,s,16,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s),s)],t.p),B.W,B.w,B.D),s),s,!0,s,s,s,s,s,s,s,s,new A.adp(this,e,c),s,s,s,s)}}
 A.adq.prototype={

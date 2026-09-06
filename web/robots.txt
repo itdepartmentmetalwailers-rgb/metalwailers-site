@@ -1,7 +1,4 @@
 User-agent: *
-Disallow: /
-Allow: /$
-Allow: /sobre-nosotros$
-Allow: /servicios$
-Allow: /contacto$
-Sitemap: https://metalwailers.com/sitemap.xml
+Allow: /
+
+Sitemap: https://www.metalwailers.com/sitemap.xml
